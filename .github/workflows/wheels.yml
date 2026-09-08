@@ -120,6 +120,10 @@ jobs:
             target: armv7-unknown-linux-musleabihf
             arch: armv7
             manylinux: auto
+          - runner: ubuntu-24.04-riscv
+            target: riscv64gc-unknown-linux-musl
+            arch: riscv64
+            manylinux: auto
         module:
           - arro3-core
           - arro3-compute
