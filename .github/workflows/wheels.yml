@@ -7,12 +7,6 @@ name: Build wheels
 
 on:
   push:
-    tags:
-      - "py-v*"
-  # On pull requests, only the emscripten job runs (the others are gated with
-  # `if: github.event_name != 'pull_request'`). This catches regressions in
-  # the emscripten/Pyodide build, which is the most fragile target, without
-  # building every native wheel on every PR.
   pull_request:
   workflow_dispatch:
 
@@ -31,22 +25,32 @@ jobs:
       matrix:
         platform:
           - runner: ubuntu-latest
-            target: x86_64
+            target: x86_64-unknown-linux-gnu
+            arch: x86_64
             manylinux: auto
           - runner: ubuntu-latest
-            target: x86
+            target: i686-unknown-linux-gnu
+            arch: x86
             manylinux: auto
           - runner: ubuntu-latest
-            target: aarch64
+            target: aarch64-unknown-linux-gnu
+            arch: aarch64
             manylinux: "2_24"
           - runner: ubuntu-latest
-            target: armv7
+            target: armv7-unknown-linux-gnueabihf
+            arch: armv7
             manylinux: auto
           - runner: ubuntu-latest
-            target: s390x
+            target: s390x-unknown-linux-gnu
+            arch: s390x
             manylinux: auto
           - runner: ubuntu-latest
-            target: ppc64le
+            target: powerpc64le-unknown-linux-gnu
+            arch: ppc64le
+            manylinux: auto
+          - runner: ubuntu-24.04-riscv
+            target: riscv64gc-unknown-linux-gnu
+            arch: riscv64
             manylinux: auto
         module:
           - arro3-core
@@ -85,7 +89,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-linux-${{ matrix.platform.target }}-${{ matrix.module }}
+          name: wheels-linux-${{ matrix.platform.arch }}-${{ matrix.module }}
           path: dist
 
   musllinux:
@@ -95,13 +99,25 @@ jobs:
       matrix:
         platform:
           - runner: ubuntu-latest
-            target: x86_64
+            target: x86_64-unknown-linux-musl
+            arch: x86_64
+            manylinux: auto
           - runner: ubuntu-latest
-            target: x86
+            target: i686-unknown-linux-musl
+            arch: x86
+            manylinux: auto
           - runner: ubuntu-latest
-            target: aarch64
+            target: aarch64-unknown-linux-musl
+            arch: aarch64
+            manylinux: "2_24"
           - runner: ubuntu-latest
-            target: armv7
+            target: armv7-unknown-linux-musleabihf
+            arch: armv7
+            manylinux: auto
+          - runner: ubuntu-24.04-riscv
+            target: riscv64gc-unknown-linux-musl
+            arch: riscv64
+            manylinux: auto
         module:
           - arro3-core
           - arro3-compute
@@ -139,7 +155,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-musllinux-${{ matrix.platform.target }}-${{ matrix.module }}
+          name: wheels-musllinux-${{ matrix.platform.arch }}-${{ matrix.module }}
           path: dist
 
   windows:
